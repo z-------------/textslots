@@ -13,14 +13,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import ./multiprog/textutils
+import ./textslots/textutils
 import std/[
   strutils,
   terminal,
 ]
 
 type
-  Multiprog* = object
+  Textslots* = object
     curSlotIdx {.requiresInit.}: int
     slots*: seq[string] ## the latest contents of each slot
     f: File
@@ -36,11 +36,11 @@ proc cursorMoveLine(f: File; count: int) =
   except OSError:
     discard
 
-proc cursorToSlot*(mp: var Multiprog; slotIdx: int) =
+proc cursorToSlot*(mp: var Textslots; slotIdx: int) =
   mp.f.cursorMoveLine(slotIdx - mp.curSlotIdx)
   mp.curSlotIdx = slotIdx
 
-proc writeSlot*(mp: var Multiprog; slotIdx: int; message: string; erase = true) =
+proc writeSlot*(mp: var Textslots; slotIdx: int; message: string; erase = true) =
   let message = block:
     let message =
       if mp.trimMessages:
@@ -60,22 +60,22 @@ proc writeSlot*(mp: var Multiprog; slotIdx: int; message: string; erase = true) 
   mp.f.write(message)
   mp.f.flushFile()
 
-proc clearSlots*(mp: var Multiprog; slotIdxs: Slice[int]) =
+proc clearSlots*(mp: var Textslots; slotIdxs: Slice[int]) =
   for i in slotIdxs:
     mp.writeSlot(i, "", erase = true)
 
-proc clearSlots*(mp: var Multiprog) =
+proc clearSlots*(mp: var Textslots) =
   mp.clearSlots(0 .. mp.slots.high)
 
-proc init*(_: typedesc[Multiprog]; outFile = stdout; trimMessages = true): Multiprog =
-  Multiprog(
+proc init*(_: typedesc[Textslots]; outFile = stdout; trimMessages = true): Textslots =
+  Textslots(
     curSlotIdx: 0,
     slots: @[""],
     f: outFile,
     trimMessages: trimMessages,
   )
 
-proc addSlot*(mp: var Multiprog) =
+proc addSlot*(mp: var Textslots) =
   # make new job and slot
   mp.cursorToSlot(mp.slots.high)
   for _ in 1..2:
@@ -84,7 +84,7 @@ proc addSlot*(mp: var Multiprog) =
   mp.curSlotIdx += 2
   mp.slots.add("")
 
-proc log*(mp: var Multiprog; message: string) =
+proc log*(mp: var Textslots; message: string) =
   mp.cursorToSlot(0)
   for line in message.splitLines:
     mp.f.eraseLine()
