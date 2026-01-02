@@ -1,8 +1,8 @@
 # Package
 
-version       = "0.0.16"
+version       = "0.0.17"
 author        = "Zack Guard"
-description   = "Show progress for multiple concurrent tasks in the terminal"
+description   = "Manage rows of text on the terminal for display purposes"
 license       = "GPL-3.0-or-later"
 srcDir        = "."
 
